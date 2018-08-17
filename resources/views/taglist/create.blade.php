@@ -12,35 +12,19 @@
             </div>
             <hr/>
             <form id="fieldsForm">
-                <div class="form-group"  id="fields">
-                    <table>
-                        <tr id="row_1" class="mb-2">
-                            <td class="col align-top"><input type="text" class="form-control" name="names[]" required/></td>
-                            <td class="col-2 align-top"><button class="btn btn-danger deleteBtn" title="Delete this input" data-id="1">&times;</button></td>
-                        </tr>
+                <div class="form-group"  id="fields" >
+                    <table data-row-number="{{$tags->count() + 1}}">
+                        @foreach($tags as $tag)
+                            <tr id="row_{{$loop->iteration}}">
+                                <td class="col-1 align-top text-center">#{{$loop->iteration}}</td>
+                                <td class="col align-top"><input type="text" class="form-control" name="names[{{$loop->iteration}}]" required value="{{$tag->name}}"/></td>
+                                <td class="col-2 align-top"><button class="btn btn-danger deleteBtn" title="Delete this input" data-id="{{$loop->iteration}}">&times;</button></td>
+                            </tr>
+                        @endforeach
                     </table>
                 </div>
             </form>
             <button class="btn btn-success col" id="saveBtn">Save</button>
-        </div>
-        <div class="col-3">
-            <h3>Existings Tags</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($tags as $tag)
-                        <tr>
-                            <td>{{ $tag->id }}</td>
-                            <td>{{ $tag->name }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
@@ -49,8 +33,6 @@
     <script type="text/javascript">
         $.validator.setDefaults({'errorClass': 'error text-danger'})
         $(document).ready(function(){
-            var rowNumber = 2;
-
             $('.deleteBtn').click(function(){
                 var id = $(this).data('id');
                 $('#row_' + id).remove();
@@ -60,10 +42,10 @@
                 var form = $('#fieldsForm');
                 form.validate({
                     rules: {
-                        'names[]': {
+                        'names[*]': {
                             required: true,
                             minlength: 3,
-                            maxlength: 20
+                            maxlength: 200
                         }
                     }
                 });
@@ -71,20 +53,28 @@
             });
 
             $('#addFieldBtn').click(function(){
+                var table = $('#fields table');
+                var rowNumber = table.data('row-number');
                 var tr = document.createElement('tr');
+                tr.id = `row_${rowNumber}`;
+                //Id
+                var td = document.createElement('td');
+                td.className="col-1 align-top text-center";
+                td.innerHTML = `#${rowNumber}`;
+                tr.append(td);
                 //Input
                 var td = document.createElement('td');
                 td.className="col align-top";
                 var input = document.createElement('input');
                 input.type = 'text';
                 input.className="form-control";
-                input.name="names[]";
+                input.name=`names[${rowNumber}]`;
                 input.required=true;
                 td.append(input);
                 tr.append(td);
                 //Button
                 var td = document.createElement('td');
-                td.className="col align-top";
+                td.className="col-2 align-top";
                 var btn = document.createElement('button');
                 btn.className="btn btn-danger deleteBtn";
                 btn.dataset.id = rowNumber;
@@ -95,8 +85,8 @@
                 td.append(btn);
                 tr.append(td);
 
-                $('#fields table').append(tr);
-                rowNumber++;
+                table.append(tr);
+                table.data('row-number', rowNumber + 1);
             });
         });
     </script>
