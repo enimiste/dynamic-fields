@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['middleware'=>"auth"], function() {
+Route::group(['middleware'=>["auth", 'scope.user']], function() {
     Route::get('/taglists/create', 'TagListController@create')->name('taglists.create');
     Route::post('/taglists/store', 'TagListController@store')->name('taglists.store');
 
