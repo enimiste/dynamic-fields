@@ -10,6 +10,10 @@
                     <button class="btn btn-dark" id="addFieldBtn">Add Field</button>
                 </div>
             </div>
+            <div class="row">
+                <div class="col" id="alerts">
+                </div>
+            </div>
             <hr/>
             <form id="fieldsForm">
                 <div class="form-group"  id="fields" >
@@ -38,6 +42,18 @@
                 $('#row_' + id).remove();
             });
 
+            function alert(type, message) {
+                    var alertsDiv = $('#alerts');
+                    var html = `
+                        <div class="alert alert-${type} alert-dismissible " id="success">
+                            <span>${message}</span>
+                            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                        </div>
+                    `;
+                    console.log(html);
+                    alertsDiv.append(html);
+            }
+
             $('#saveBtn').click(function(){
                 var form = $('#fieldsForm');
                 form.validate({
@@ -49,7 +65,16 @@
                         }
                     }
                 });
-                console.log('Form valid', form.valid());
+                if(form.valid()){
+                    $('#alerts').html('');
+                    axios.post("{{route('taglists.store')}}", {tags: form.serializeArray()})
+                    .then(function(response){
+                        alert('success', 'Saved');
+                    })
+                    .catch(function(err){
+                        alert('danger', JSON.stringify(err));
+                    });
+                }
             });
 
             $('#addFieldBtn').click(function(){

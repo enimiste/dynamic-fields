@@ -13,6 +13,6 @@ class TagListController extends Controller
     }
 
     public function store(Request $request) {
-        return redirect()->to('taglists.create');
+        return response()->json(['data'=>['message'=>'Saved!']]);
     }
 }
