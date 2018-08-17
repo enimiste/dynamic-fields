@@ -28,10 +28,11 @@ class TagListController extends Controller
                 'data'=> ['errors'=>$validator->errors()->toArray()]
             ], 400);
         } else {
-            \DB::transaction(function() use ($request) {
+            $userId = auth()->user()->id;
+            \DB::transaction(function() use ($request, $userId) {
                     TagList::query()->delete();
-                    collect($request->input('tags'))->map(function($t){
-                        return ['name'=>$t['value']];
+                    collect($request->input('tags'))->map(function($t) use ($userId){
+                        return ['name'=>$t['value'], 'user_id'=>$userId];
                     })->each(function($tag){
                         TagList::create($tag);
                     });
